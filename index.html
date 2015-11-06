@@ -1,1 +1,173 @@
-My Page
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Localizze</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+    <link href="cover.css" rel="stylesheet">
+</head>
+<body>
+
+<style>
+  #progress_bar {
+    margin: 10px 0;
+    padding: 3px;
+    border: 1px solid #000;
+    font-size: 14px;
+    clear: both;
+    opacity: 0;
+    -moz-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+  }
+  #progress_bar.loading {
+    opacity: 1.0;
+  }
+  #progress_bar .percent {
+    background-color: #99ccff;
+    height: auto;
+    width: 0;
+  }
+</style>
+
+<div class="site-wrapper">
+
+      <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+          <div class="masthead clearfix">
+            <div class="inner">
+              <h1 class="masthead-brand">Localizze</h3>
+              <nav>
+                <ul class="nav masthead-nav">
+                  <li class="active"><a href="#">Home</a></li>
+                  <li><a href="mailto:amar.idrizovic@devlogic.eu?Subject=Localizze">Suggestions</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+
+          <div class="inner cover">
+<input style="display: inline-block;" class="btn btn-lg btn-default" accept=".csv" id="files" name="file" type="file">
+<div id="progress_bar"><div class="percent">0%</div></div>
+<a class="lead" download="strings.xml" id="downloadlink" style="display: none">Download Android</a>
+<a class="lead" download="Localizable.strings_XX.strings" id="downloadlinkios" style="display: none">Download iOS</a>
+          </div>
+
+<div class="mastfoot">
+          <div class="inner">
+            <p class="lead">Upload a .csv file where the first column are the keys and the second column translations and it will generate Android and iOS resource file for it. <a href="translations.csv">Example</a></p>
+          </div>
+</div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+<script>
+  var reader;
+  var progress = document.querySelector('.percent');
+
+  function errorHandler(evt) {
+    switch(evt.target.error.code) {
+      case evt.target.error.NOT_FOUND_ERR:
+        alert('File Not Found!');
+        break;
+      case evt.target.error.NOT_READABLE_ERR:
+        alert('File is not readable');
+        break;
+      case evt.target.error.ABORT_ERR:
+        break; // noop
+      default:
+        alert('An error occurred reading this file.');
+    };
+  }
+
+  function updateProgress(evt) {
+    // evt is an ProgressEvent.
+    if (evt.lengthComputable) {
+      var percentLoaded = Math.round((evt.loaded / evt.total) * 100);
+      // Increase the progress bar length.
+      if (percentLoaded < 100) {
+        progress.style.width = percentLoaded + '%';
+        progress.textContent = percentLoaded + '%';
+      }
+    }
+  }
+
+function makeTextFile(text) {
+var textFile = null;
+    var data = new Blob([text], {type: 'text/plain'});
+
+    // If we are replacing a previously generated file we need to
+    // manually revoke the object URL to avoid memory leaks.
+    if (textFile !== null) {
+      window.URL.revokeObjectURL(textFile);
+    }
+
+    textFile = window.URL.createObjectURL(data);
+
+    return textFile;
+  };
+
+  function handleFileSelect(evt) {
+var link = document.getElementById('downloadlink');
+var linkios = document.getElementById('downloadlinkios');
+var translations = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n", translationsios = "";
+    // Reset progress indicator on new file selection.
+    progress.style.width = '0%';
+    progress.textContent = '0%';
+
+    reader = new FileReader();
+    reader.onerror = errorHandler;
+    reader.onprogress = updateProgress;
+    reader.onabort = function(e) {
+      alert('File read cancelled');
+    };
+    reader.onloadstart = function(e) {
+      document.getElementById('progress_bar').className = 'loading';
+    link.style.display = 'none';
+    linkios.style.display = 'none';
+    };
+    reader.onload = function(e) {
+      // Ensure that the progress bar displays 100% at the end.
+      progress.style.width = '100%';
+      progress.textContent = '100%';
+      setTimeout("document.getElementById('progress_bar').className='';", 2000);
+    }
+    reader.onloadend = function(evt) {
+      if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+         var lines = evt.target.result.split('\n');
+
+    for(var i = 0; i < lines.length - 1; i++){
+lines[i] = lines[i].replace("&","&amp;");
+lines[i] = lines[i].replace("'","\'");
+var line = lines[i].split(',');
+translations += "<string name=\"";
+translations += line[0];
+translations += "\">";
+translations += line[1];
+translations += "</string>\n";
+translationsios += "\"" + line[0] + "\" = \"" + line[1] + "\";\n";
+    }
+translations += "</resources>";
+    link.href = makeTextFile(translations);
+    link.style.display = 'block';
+    linkios.href = makeTextFile(translationsios);
+    linkios.style.display = 'block';
+      }
+    };
+
+    // Read in the image file as a binary string.
+    reader.readAsText(evt.target.files[0], "utf-8");
+  }
+
+  document.getElementById('files').addEventListener('change', handleFileSelect, false);
+</script>
+</body>
+</html>
