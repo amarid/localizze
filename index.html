@@ -138,7 +138,7 @@ var translations = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n", 
       // Ensure that the progress bar displays 100% at the end.
       progress.style.width = '100%';
       progress.textContent = '100%';
-      setTimeout("document.getElementById('progress_bar').className='';", 2000);
+      setTimeout("document.getElementById('progress_bar').className='';", 1500);
     }
     reader.onloadend = function(evt) {
       if (evt.target.readyState == FileReader.DONE) { // DONE == 2
