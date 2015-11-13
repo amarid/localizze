@@ -25,9 +25,7 @@
     opacity: 1.0;
   }
   #progress_bar .percent {
-    background-color: #99ccff;
-    height: auto;
-    width: 0;
+    background-color: #99ccff; height: auto; width: 0;
   }
 </style>
 
@@ -146,17 +144,19 @@ var translations = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n", 
          var lines = evt.target.result.split('\n');
 
     for(var i = 0; i < lines.length - 1; i++){
-lines[i] = lines[i].replace("&","&amp;");
-lines[i] = lines[i].replace("'","\'");
-var line = lines[i].split(',');
-translations += "<string name=\"";
-translations += line[0];
-translations += "\">";
-translations += line[1];
-translations += "</string>\n";
-translationsios += "\"" + line[0] + "\" = \"" + line[1] + "\";\n";
+        lines[i] = lines[i].replace("&","&amp;");
+        lines[i] = lines[i].replace("'","\'");
+        var line = lines[i].split(',');
+        var key = line[0];
+        var translation = lines[i].substring(line[0].length + 1);
+        translations += "<string name=\"";
+        translations += key;
+        translations += "\">";
+        translations += translation;
+        translations += "</string>\n";
+        translationsios += "\"" + key + "\" = \"" + translation + "\";\n";
     }
-translations += "</resources>";
+    translations += "</resources>";
     link.href = makeTextFile(translations);
     link.style.display = 'block';
     linkios.href = makeTextFile(translationsios);
