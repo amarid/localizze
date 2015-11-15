@@ -144,11 +144,12 @@ var translations = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<resources>\n", 
          var lines = evt.target.result.split('\n');
 
     for(var i = 0; i < lines.length - 1; i++){
-        lines[i] = lines[i].replace("&","&amp;");
-        lines[i] = lines[i].replace("'","\'");
-        var line = lines[i].split(',');
-        var key = line[0];
-        var translation = lines[i].substring(line[0].length + 1);
+		var line = lines[i];
+        line = line.replace("&","&amp;");
+        line = line.replace("'","\'");
+        var n = line.indexOf(',');
+        var key = line.substring(0, n);
+        var translation = line.substring(n + 1);
         translations += "<string name=\"";
         translations += key;
         translations += "\">";
